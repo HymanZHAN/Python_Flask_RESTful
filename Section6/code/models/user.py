@@ -1,42 +1,26 @@
 import sqlite3
+from db import db
 
 
-class UserModel:
-    def __init__(self, user_id, username, password):
-        self.id = user_id
+class UserModel(db.Model):
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80))
+    password = db.Column(db.String(80))
+
+    def __init__(self, username, password):
         self.username = username
         self.password = password
 
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
     @classmethod
     def find_by_username(cls, username):
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-
-        query = "SELECT * FROM users WHERE username=?"
-        # execute action has to use tuple data type
-        result = cursor.execute(query, (username,))
-        row = result.fetchone()
-        if row:
-            user = cls(*row)
-        else:
-            user = None
-
-        connection.close()
-        return user
+        return cls.query.filter_by(username=username).first()
 
     @classmethod
     def find_by_id(cls, user_id):
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-
-        query = "SELECT * FROM users WHERE id=?"
-        # execute action has to use tuple data type
-        result = cursor.execute(query, (user_id,))
-        row = result.fetchone()
-        if row:
-            user = cls(*row)
-        else:
-            user = None
-
-        connection.close()
-        return user
+        return cls.query.filter_by(id=user_id).first()

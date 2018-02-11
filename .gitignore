@@ -3,3 +3,4 @@
 idea_venv
 __pycache__
 venv
+*.db
